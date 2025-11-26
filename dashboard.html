@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistem Manajemen Rumah Sakit</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover-color: #0069d9;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --info-color: #17a2b8;
+            --info-hover-color: #138496;
+            --warning-color: #ffc107;
+            --warning-hover-color: #e0a800;
+            --bg-light: #f8f9fa;
+            --text-dark: #343a40;
+            --border-light: #dee2e6;
+            --card-bg: #ffffff;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --label-color: #555;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow-light);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-tabs button {
+            background-color: transparent;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--secondary-color);
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin: 0 5px;
+        }
+
+        .nav-tabs button:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-tabs button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            border-radius: 8px;
+            overflow: hidden; /* Ensures rounded corners apply to table */
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        td button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        td button:active {
+            transform: translateY(1px);
+        }
+
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .btn-add:hover { background-color: var(--success-hover-color); }
+
+        .btn-edit {
+            background-color: var(--info-color);
+            color: white;
+        }
+        .btn-edit:hover { background-color: var(--info-hover-color); }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .btn-delete:hover { background-color: var(--danger-hover-color); }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--text-dark);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .modal-content form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+
+        .modal-content form input[type="text"],
+        .modal-content form input[type="number"],
+        .modal-content form input[type="date"],
+        .modal-content form textarea,
+        .modal-content form select {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .modal-content form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-content form button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content form button[type="submit"]:hover {
+            background-color: var(--primary-hover-color);
+        }
+
+        #message-area {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        #message-area.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #message-area.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Dashboard Sistem Manajemen Rumah Sakit</h1>
+
+        <div class="nav-tabs">
+            <button class="tab-button active" data-tab="pasien">Pasien</button>
+            <button class="tab-button" data-tab="dokter">Dokter</button>
+            <button class="tab-button" data-tab="obat">Obat</button>
+            <button class="tab-button" data-tab="resep">Resep</button>
+        </div>
+
+        <div id="message-area"></div>
+
+        <div id="pasien-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Daftar Pasien</h2>
+                <button class="btn-add" onclick="openModal('pasien')">Tambah Pasien Baru</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Umur</th>
+                        <th>Alamat</th>
+                        <th>Nomor Telepon</th>
+                        <th>Tanggal Lahir</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="pasien-table-body">
+                    <!-- Data pasien akan dimuat di sini -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="dokter-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Daftar Dokter</h2>
+                <button class="btn-add" onclick="openModal('dokter')">Tambah Dokter Baru</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Spesialisasi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="dokter-table-body">
+                    <!-- Data dokter akan dimuat di sini -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="obat-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Daftar Obat</h2>
+                <button class="btn-add" onclick="openModal('obat')">Tambah Obat Baru</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Deskripsi</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="obat-table-body">
+                    <!-- Data obat akan dimuat di sini -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="resep-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Daftar Resep</h2>
+                <button class="btn-add" onclick="openModal('resep')">Tambah Resep Baru</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pasien</th>
+                        <th>Dokter</th>
+                        <th>Obat</th>
+                        <th>Dosis</th>
+                        <th>Tanggal Resep</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="resep-table-body">
+                    <!-- Data resep akan dimuat di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title"></h3>
+            <form id="dataForm">
+                <!-- Form fields will be dynamically generated here -->
+                <button type="submit" id="modal-submit-button"></button>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
